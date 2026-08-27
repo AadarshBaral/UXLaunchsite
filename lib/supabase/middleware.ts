@@ -27,7 +27,23 @@ export async function updateSession(request: NextRequest) {
 
   // Refreshes the auth token if expired. Required for server-side auth
   // to keep working; do not add logic between client creation and this call.
-  await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const { pathname } = request.nextUrl;
+  const isPublicPath =
+    pathname === "/login" || pathname.startsWith("/auth") || pathname.startsWith("/docs");
+
+  if (!user && !isPublicPath) {
+    const loginUrl = new URL("/login", request.url);
+    loginUrl.searchParams.set("next", pathname);
+    return NextResponse.redirect(loginUrl);
+  }
+
+  if (user && pathname === "/login") {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
   return supabaseResponse;
 }

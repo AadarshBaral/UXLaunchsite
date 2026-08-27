@@ -1,6 +1,6 @@
+import AuthSync from "@/components/auth/AuthSync";
 import type { Metadata } from "next";
-import { Raleway, Merriweather } from "next/font/google";
-import TopNav from "@/components/layout/TopNav";
+import { Merriweather, Raleway } from "next/font/google";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -15,7 +15,7 @@ const merriweather = Merriweather({
 });
 
 export const metadata: Metadata = {
-  title: "UX Launchpad",
+  title: "UX Launchsite",
   description: "Zero-to-one UX design system & workflow management tool.",
 };
 
@@ -26,8 +26,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={`${raleway.variable} ${merriweather.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-background text-ink text-sm">
-        <TopNav />
-        <main className="flex-1 flex flex-col">{children}</main>
+        <AuthSync />
+        {children}
       </body>
     </html>
   );

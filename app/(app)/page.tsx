@@ -1,20 +1,20 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
-import { useRouter } from "next/navigation";
-import { LayoutGrid, List, Plus, Search, Upload } from "lucide-react";
-import { useStore } from "@/lib/store";
-import { getOverallProgress } from "@/lib/workflow/progress";
-import { formatDate, isOverdue } from "@/lib/date";
-import Button from "@/components/ui/Button";
-import Menu, { type MenuItem } from "@/components/ui/Menu";
-import Avatar from "@/components/ui/Avatar";
-import ProjectFormModal from "@/components/projects/ProjectFormModal";
-import ConfirmModal from "@/components/ui/ConfirmModal";
 import PhaseDots from "@/components/projects/PhaseDots";
 import ProjectCard from "@/components/projects/ProjectCard";
+import ProjectFormModal from "@/components/projects/ProjectFormModal";
+import Avatar from "@/components/ui/Avatar";
+import Button from "@/components/ui/Button";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+import Menu, { type MenuItem } from "@/components/ui/Menu";
+import { formatDate, isOverdue } from "@/lib/date";
 import { downloadFile, slugify } from "@/lib/export";
+import { useStore } from "@/lib/store";
+import { getOverallProgress } from "@/lib/workflow/progress";
 import type { Project } from "@/lib/workflow/types";
+import { LayoutGrid, List, Plus, Search, Upload } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { useMemo, useRef, useState } from "react";
 
 type ViewMode = "list" | "card";
 
@@ -36,11 +36,19 @@ export default function ProjectsHome() {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const filtered = useMemo(
-    () => projects.filter((p) => p.name.toLowerCase().includes(query.toLowerCase())),
-    [projects, query]
+    () =>
+      projects.filter((p) =>
+        p.name.toLowerCase().includes(query.toLowerCase()),
+      ),
+    [projects, query],
   );
 
-  function handleCreate(values: { name: string; avatar?: string; startDate?: string; dueDate?: string }) {
+  function handleCreate(values: {
+    name: string;
+    avatar?: string;
+    startDate?: string;
+    dueDate?: string;
+  }) {
     const id = createProject(values.name, {
       avatar: values.avatar,
       startDate: values.startDate,
@@ -55,11 +63,14 @@ export default function ProjectsHome() {
     reader.onload = () => {
       try {
         const parsed = JSON.parse(String(reader.result)) as Project;
-        if (!parsed.deliverables || !parsed.name) throw new Error("Invalid file");
+        if (!parsed.deliverables || !parsed.name)
+          throw new Error("Invalid file");
         const id = importProject(parsed);
         router.push(`/projects/${id}`);
       } catch {
-        alert("That file doesn't look like a valid UX Launchpad project export.");
+        alert(
+          "That file doesn't look like a valid UX Launchsite project export.",
+        );
       }
     };
     reader.readAsText(file);
@@ -72,9 +83,17 @@ export default function ProjectsHome() {
       {
         label: "Export JSON",
         onSelect: () =>
-          downloadFile(`${slugify(project.name)}.json`, JSON.stringify(project, null, 2), "application/json"),
+          downloadFile(
+            `${slugify(project.name)}.json`,
+            JSON.stringify(project, null, 2),
+            "application/json",
+          ),
       },
-      { label: "Delete", onSelect: () => setDeleteTarget(project), danger: true },
+      {
+        label: "Delete",
+        onSelect: () => setDeleteTarget(project),
+        danger: true,
+      },
     ];
   }
 
@@ -98,7 +117,11 @@ export default function ProjectsHome() {
               e.target.value = "";
             }}
           />
-          <Button variant="secondary" size="md" onClick={() => fileInputRef.current?.click()}>
+          <Button
+            variant="secondary"
+            size="md"
+            onClick={() => fileInputRef.current?.click()}
+          >
             <Upload size={14} /> Import
           </Button>
           <Button variant="primary" size="md" onClick={() => setNewOpen(true)}>
@@ -109,7 +132,10 @@ export default function ProjectsHome() {
 
       <div className="flex items-center justify-between gap-3">
         <div className="relative max-w-xs flex-1">
-          <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-disabled" />
+          <Search
+            size={14}
+            className="absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-disabled"
+          />
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
@@ -122,7 +148,9 @@ export default function ProjectsHome() {
             onClick={() => setView("list")}
             aria-label="List view"
             className={`h-7 w-7 inline-flex items-center justify-center rounded cursor-pointer ${
-              view === "list" ? "bg-surface text-ink" : "text-ink-disabled hover:text-ink"
+              view === "list"
+                ? "bg-surface text-ink"
+                : "text-ink-disabled hover:text-ink"
             }`}
           >
             <List size={15} />
@@ -131,7 +159,9 @@ export default function ProjectsHome() {
             onClick={() => setView("card")}
             aria-label="Card view"
             className={`h-7 w-7 inline-flex items-center justify-center rounded cursor-pointer ${
-              view === "card" ? "bg-surface text-ink" : "text-ink-disabled hover:text-ink"
+              view === "card"
+                ? "bg-surface text-ink"
+                : "text-ink-disabled hover:text-ink"
             }`}
           >
             <LayoutGrid size={15} />
@@ -142,10 +172,16 @@ export default function ProjectsHome() {
       {filtered.length === 0 ? (
         <div className="border border-line rounded-md py-16 flex flex-col items-center justify-center gap-3 text-center">
           <p className="text-sm text-ink-muted">
-            {projects.length === 0 ? "No projects yet." : "No projects match your search."}
+            {projects.length === 0
+              ? "No projects yet."
+              : "No projects match your search."}
           </p>
           {projects.length === 0 && (
-            <Button variant="secondary" size="sm" onClick={() => setNewOpen(true)}>
+            <Button
+              variant="secondary"
+              size="sm"
+              onClick={() => setNewOpen(true)}
+            >
               Create your first project
             </Button>
           )}
@@ -157,16 +193,23 @@ export default function ProjectsHome() {
               <tr className="border-b border-line bg-surface text-xs font-medium text-ink-muted">
                 <th className="text-left px-4 py-2 font-medium">Name</th>
                 <th className="text-left px-4 py-2 font-medium w-32">Phases</th>
-                <th className="text-right px-4 py-2 font-medium w-20">Progress</th>
+                <th className="text-right px-4 py-2 font-medium w-20">
+                  Progress
+                </th>
                 <th className="text-left px-4 py-2 font-medium w-28">Due</th>
-                <th className="text-left px-4 py-2 font-medium w-28">Updated</th>
+                <th className="text-left px-4 py-2 font-medium w-28">
+                  Updated
+                </th>
                 <th className="w-10" />
               </tr>
             </thead>
             <tbody>
               {filtered.map((project) => {
                 const progress = getOverallProgress(project);
-                const overdue = isOverdue(project.dueDate, progress.ratio === 1);
+                const overdue = isOverdue(
+                  project.dueDate,
+                  progress.ratio === 1,
+                );
                 return (
                   <tr
                     key={project.id}
@@ -175,8 +218,14 @@ export default function ProjectsHome() {
                   >
                     <td className="px-4 py-2">
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <Avatar src={project.avatar} name={project.name} size={24} />
-                        <span className="font-medium text-ink truncate">{project.name}</span>
+                        <Avatar
+                          src={project.avatar}
+                          name={project.name}
+                          size={24}
+                        />
+                        <span className="font-medium text-ink truncate">
+                          {project.name}
+                        </span>
                       </div>
                     </td>
                     <td className="px-4 py-2">
@@ -185,11 +234,18 @@ export default function ProjectsHome() {
                     <td className="px-4 py-2 text-right text-ink-muted tabular-nums">
                       {progress.complete}/{progress.total}
                     </td>
-                    <td className={`px-4 py-2 ${overdue ? "text-status-red" : "text-ink-muted"}`}>
+                    <td
+                      className={`px-4 py-2 ${overdue ? "text-status-red" : "text-ink-muted"}`}
+                    >
                       {formatDate(project.dueDate)}
                     </td>
-                    <td className="px-4 py-2 text-ink-muted">{formatDate(project.updatedAt)}</td>
-                    <td className="px-2 py-2 text-right" onClick={(e) => e.stopPropagation()}>
+                    <td className="px-4 py-2 text-ink-muted">
+                      {formatDate(project.updatedAt)}
+                    </td>
+                    <td
+                      className="px-2 py-2 text-right"
+                      onClick={(e) => e.stopPropagation()}
+                    >
                       <Menu items={menuItemsFor(project)} />
                     </td>
                   </tr>
@@ -201,12 +257,20 @@ export default function ProjectsHome() {
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {filtered.map((project) => (
-            <ProjectCard key={project.id} project={project} menuItems={menuItemsFor(project)} />
+            <ProjectCard
+              key={project.id}
+              project={project}
+              menuItems={menuItemsFor(project)}
+            />
           ))}
         </div>
       )}
 
-      <ProjectFormModal open={newOpen} onClose={() => setNewOpen(false)} onSubmit={handleCreate} />
+      <ProjectFormModal
+        open={newOpen}
+        onClose={() => setNewOpen(false)}
+        onSubmit={handleCreate}
+      />
       {settingsTarget && (
         <ProjectFormModal
           key={settingsTarget.id}

@@ -1,6 +1,6 @@
-import Link from "next/link";
-import { getDocPhase } from "@/lib/docs/content";
 import DocStepCard from "@/components/docs/DocStepCard";
+import { getDocPhase } from "@/lib/docs/content";
+import Link from "next/link";
 
 export default async function DocsPhasePage({
   params,
@@ -11,7 +11,9 @@ export default async function DocsPhasePage({
   const phase = getDocPhase(phaseId);
 
   if (!phase) {
-    return <p className="text-sm text-ink-muted">This phase doesn&apos;t exist.</p>;
+    return (
+      <p className="text-sm text-ink-muted">This phase doesn&apos;t exist.</p>
+    );
   }
 
   const isGuide = phase.id === "guide";
@@ -24,10 +26,14 @@ export default async function DocsPhasePage({
         </h2>
         <p className="text-sm text-ink-muted mt-1">
           {isGuide ? (
-            <>A practical walkthrough of UX Launchpad&apos;s own features, alongside the methodology manual.</>
+            <>
+              A practical walkthrough of UX Launchsite&apos;s own features,
+              alongside the methodology manual.
+            </>
           ) : (
             <>
-              Step-by-step execution manual — pair this with the matching workspace templates in{" "}
+              Step-by-step execution manual — pair this with the matching
+              workspace templates in{" "}
               <Link href="/" className="text-accent hover:underline">
                 your projects
               </Link>
