@@ -15,6 +15,21 @@
   --status-red: #e5484d;
 }
 
+.dark {
+  --background: #0f1117;
+  --surface: #1a1d27;
+  --line: #2a2d3a;
+  --ink: #f0f2f5;
+  --ink-muted: #8b95a8;
+  --ink-disabled: #4b5260;
+  --accent: #4db6ac;
+  --accent-ink: #0f1117;
+  --status-green: #34d399;
+  --status-amber: #fbbf24;
+  --status-gray: #6b7280;
+  --status-red: #f87171;
+}
+
 @theme inline {
   --color-background: var(--background);
   --color-surface: var(--surface);
@@ -52,7 +67,13 @@ body {
   width: 8px;
   height: 8px;
 }
+
 .thin-scroll::-webkit-scrollbar-thumb {
   background: var(--line);
   border-radius: 4px;
+}
+
+/* Invert dark logo in dark mode */
+.dark .logo-adaptive {
+  filter: invert(1) brightness(2);
 }

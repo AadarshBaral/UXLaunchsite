@@ -1,4 +1,6 @@
 import SignOutButton from "@/components/auth/SignOutButton";
+import NavLinks from "@/components/layout/NavLinks";
+import ThemeToggle from "@/components/layout/ThemeToggle";
 import { createClient } from "@/lib/supabase/server";
 import Image from "next/image";
 import Link from "next/link";
@@ -18,24 +20,12 @@ export default async function TopNav() {
             alt="UX Launchsite"
             width={160}
             height={39}
-            className="h-7 w-auto"
+            className="h-7 w-auto logo-adaptive"
           />
         </Link>
-        <nav className="flex items-center gap-6 text-sm flex-1">
-          <Link
-            href="/"
-            className="text-ink-muted hover:text-ink transition-colors"
-          >
-            Projects
-          </Link>
-          <Link
-            href="/docs"
-            className="text-ink-muted hover:text-ink transition-colors"
-          >
-            Documentation
-          </Link>
-        </nav>
-        <div className="flex items-center gap-4 text-sm">
+        <NavLinks />
+        <div className="flex items-center gap-2 text-sm">
+          <ThemeToggle />
           {user ? (
             <>
               <span className="text-ink-muted truncate max-w-[180px]">
