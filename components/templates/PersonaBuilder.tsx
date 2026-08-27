@@ -27,7 +27,9 @@ function ListField({
 }) {
   return (
     <div>
-      <label className="block text-xs font-medium text-ink-muted mb-1.5">{label}</label>
+      <label className="block text-xs font-medium text-ink-muted mb-1.5">
+        {label}
+      </label>
       <div className="flex flex-col gap-1.5">
         {items.map((item, i) => (
           <div key={i} className="flex items-center gap-1.5">
@@ -47,7 +49,12 @@ function ListField({
             </button>
           </div>
         ))}
-        <Button variant="ghost" size="sm" className="self-start" onClick={() => onChange([...items, ""])}>
+        <Button
+          variant="ghost"
+          size="sm"
+          className="self-start"
+          onClick={() => onChange([...items, ""])}
+        >
           <Plus size={13} /> Add
         </Button>
       </div>
@@ -64,12 +71,16 @@ export default function PersonaBuilder({
 }) {
   function updatePersona(id: string, patch: Partial<PersonaField>) {
     onChange({
-      personas: data.personas.map((p) => (p.id === id ? { ...p, ...patch } : p)),
+      personas: data.personas.map((p) =>
+        p.id === id ? { ...p, ...patch } : p,
+      ),
     });
   }
 
   function addPersona() {
-    onChange({ personas: [...data.personas, { id: makeId(), ...EMPTY_PERSONA }] });
+    onChange({
+      personas: [...data.personas, { id: makeId(), ...EMPTY_PERSONA }],
+    });
   }
 
   function removePersona(id: string) {
@@ -79,7 +90,10 @@ export default function PersonaBuilder({
   return (
     <div className="flex flex-col gap-6">
       {data.personas.map((persona) => (
-        <div key={persona.id} className="border border-line rounded-md p-4 flex flex-col gap-3">
+        <div
+          key={persona.id}
+          className="border border-line rounded-md p-4 flex flex-col gap-3"
+        >
           <div className="flex items-center justify-between">
             <span className="text-xs font-medium text-ink-muted">Persona</span>
             <button
@@ -90,22 +104,28 @@ export default function PersonaBuilder({
               <Trash2 size={14} />
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <Input
               placeholder="Name"
               value={persona.name}
-              onChange={(e) => updatePersona(persona.id, { name: e.target.value })}
+              onChange={(e) =>
+                updatePersona(persona.id, { name: e.target.value })
+              }
             />
             <Input
               placeholder="Role / segment"
               value={persona.role}
-              onChange={(e) => updatePersona(persona.id, { role: e.target.value })}
+              onChange={(e) =>
+                updatePersona(persona.id, { role: e.target.value })
+              }
             />
           </div>
           <Input
             placeholder="Representative quote"
             value={persona.quote}
-            onChange={(e) => updatePersona(persona.id, { quote: e.target.value })}
+            onChange={(e) =>
+              updatePersona(persona.id, { quote: e.target.value })
+            }
           />
           <Textarea
             placeholder="Short bio / context"
@@ -121,7 +141,9 @@ export default function PersonaBuilder({
           <ListField
             label="Frustrations"
             items={persona.frustrations}
-            onChange={(frustrations) => updatePersona(persona.id, { frustrations })}
+            onChange={(frustrations) =>
+              updatePersona(persona.id, { frustrations })
+            }
           />
           <ListField
             label="Behaviors"
@@ -130,7 +152,12 @@ export default function PersonaBuilder({
           />
         </div>
       ))}
-      <Button variant="secondary" size="sm" onClick={addPersona} className="self-start">
+      <Button
+        variant="secondary"
+        size="sm"
+        onClick={addPersona}
+        className="self-start"
+      >
         <Plus size={14} /> Add persona
       </Button>
     </div>

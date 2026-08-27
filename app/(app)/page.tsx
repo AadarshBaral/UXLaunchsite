@@ -102,10 +102,10 @@ export default function ProjectsHome() {
   }
 
   return (
-    <div className="mx-auto max-w-[1280px] w-full px-6 py-8 flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+    <div className="mx-auto max-w-[1280px] w-full px-4 sm:px-6 py-6 sm:py-8 flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <h1 className="font-serif text-2xl font-semibold text-ink">Projects</h1>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <input
             ref={fileInputRef}
             type="file"
@@ -187,8 +187,8 @@ export default function ProjectsHome() {
           )}
         </div>
       ) : view === "list" ? (
-        <div className="border border-line rounded-md overflow-hidden">
-          <table className="w-full text-sm">
+        <div className="border border-line rounded-md overflow-x-auto thin-scroll">
+          <table className="w-full text-sm min-w-[520px]">
             <thead>
               <tr className="border-b border-line bg-surface text-xs font-medium text-ink-muted">
                 <th className="text-left px-4 py-2 font-medium">Name</th>
@@ -197,7 +197,7 @@ export default function ProjectsHome() {
                   Progress
                 </th>
                 <th className="text-left px-4 py-2 font-medium w-28">Due</th>
-                <th className="text-left px-4 py-2 font-medium w-28">
+                <th className="text-left px-4 py-2 font-medium w-28 hidden sm:table-cell">
                   Updated
                 </th>
                 <th className="w-10" />
@@ -239,7 +239,7 @@ export default function ProjectsHome() {
                     >
                       {formatDate(project.dueDate)}
                     </td>
-                    <td className="px-4 py-2 text-ink-muted">
+                    <td className="px-4 py-2 text-ink-muted hidden sm:table-cell">
                       {formatDate(project.updatedAt)}
                     </td>
                     <td

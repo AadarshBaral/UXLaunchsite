@@ -4,7 +4,11 @@ import { ArrowDown, Plus, Trash2 } from "lucide-react";
 import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { makeId } from "@/lib/id";
-import type { UserFlowData, UserFlowNode, UserFlowNodeType } from "@/lib/workflow/types";
+import type {
+  UserFlowData,
+  UserFlowNode,
+  UserFlowNodeType,
+} from "@/lib/workflow/types";
 
 const TYPE_LABEL: Record<UserFlowNodeType, string> = {
   start: "Start",
@@ -28,14 +32,20 @@ export default function UserFlowGenerator({
   onChange: (data: UserFlowData) => void;
 }) {
   function update(id: string, patch: Partial<UserFlowNode>) {
-    onChange({ nodes: data.nodes.map((n) => (n.id === id ? { ...n, ...patch } : n)) });
+    onChange({
+      nodes: data.nodes.map((n) => (n.id === id ? { ...n, ...patch } : n)),
+    });
   }
 
   function addNode() {
     const endIndex = data.nodes.findIndex((n) => n.type === "end");
     const insertAt = endIndex === -1 ? data.nodes.length : endIndex;
     const next = [...data.nodes];
-    next.splice(insertAt, 0, { id: makeId(), label: "New screen", type: "screen" });
+    next.splice(insertAt, 0, {
+      id: makeId(),
+      label: "New screen",
+      type: "screen",
+    });
     onChange({ nodes: next });
   }
 
@@ -47,30 +57,55 @@ export default function UserFlowGenerator({
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-2">
         {data.nodes.map((node) => (
-          <div key={node.id} className="flex items-center gap-1.5">
-            <select
-              value={node.type}
-              onChange={(e) => update(node.id, { type: e.target.value as UserFlowNodeType })}
-              className="h-9 rounded-md border border-line bg-background px-2 text-sm text-ink w-36 shrink-0"
-            >
-              {Object.entries(TYPE_LABEL).map(([value, label]) => (
-                <option key={value} value={value}>
-                  {label}
-                </option>
-              ))}
-            </select>
-            <Input value={node.label} onChange={(e) => update(node.id, { label: e.target.value })} />
-            {node.type !== "start" && node.type !== "end" && (
-              <button
-                onClick={() => removeNode(node.id)}
-                className="h-8 w-8 shrink-0 inline-flex items-center justify-center rounded-md text-ink-disabled hover:text-status-red hover:bg-surface cursor-pointer"
+          <div
+            key={node.id}
+            className="flex flex-col sm:flex-row items-stretch sm:items-center gap-1.5 p-2 sm:p-0 border sm:border-0 border-line rounded-md"
+          >
+            <div className="flex items-center gap-1.5">
+              <select
+                value={node.type}
+                onChange={(e) =>
+                  update(node.id, { type: e.target.value as UserFlowNodeType })
+                }
+                className="h-9 rounded-md border border-line bg-background px-2 text-sm text-ink w-full sm:w-36 shrink-0"
               >
-                <Trash2 size={13} />
-              </button>
-            )}
+                {Object.entries(TYPE_LABEL).map(([value, label]) => (
+                  <option key={value} value={value}>
+                    {label}
+                  </option>
+                ))}
+              </select>
+              {node.type !== "start" && node.type !== "end" && (
+                <button
+                  onClick={() => removeNode(node.id)}
+                  className="sm:hidden h-9 w-9 shrink-0 inline-flex items-center justify-center rounded-md text-ink-disabled hover:text-status-red hover:bg-surface cursor-pointer"
+                >
+                  <Trash2 size={14} />
+                </button>
+              )}
+            </div>
+            <div className="flex items-center gap-1.5 flex-1">
+              <Input
+                value={node.label}
+                onChange={(e) => update(node.id, { label: e.target.value })}
+              />
+              {node.type !== "start" && node.type !== "end" && (
+                <button
+                  onClick={() => removeNode(node.id)}
+                  className="hidden sm:inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-md text-ink-disabled hover:text-status-red hover:bg-surface cursor-pointer"
+                >
+                  <Trash2 size={13} />
+                </button>
+              )}
+            </div>
           </div>
         ))}
-        <Button variant="secondary" size="sm" onClick={addNode} className="self-start">
+        <Button
+          variant="secondary"
+          size="sm"
+          onClick={addNode}
+          className="self-start"
+        >
           <Plus size={14} /> Add node
         </Button>
       </div>

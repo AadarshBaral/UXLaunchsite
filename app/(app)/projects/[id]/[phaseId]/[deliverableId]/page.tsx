@@ -1,14 +1,14 @@
 "use client";
 
-import { use } from "react";
-import Link from "next/link";
-import { ArrowLeft, Check, Download } from "lucide-react";
-import { useStore, useProject } from "@/lib/store";
-import { getDeliverableConfig } from "@/lib/workflow/config";
-import { runExport } from "@/lib/workflow/exportActions";
 import Button from "@/components/ui/Button";
 import Menu from "@/components/ui/Menu";
 import TemplateBody from "@/components/workspace/TemplateBody";
+import { useProject, useStore } from "@/lib/store";
+import { getDeliverableConfig } from "@/lib/workflow/config";
+import { runExport } from "@/lib/workflow/exportActions";
+import { ArrowLeft, Check, Download } from "lucide-react";
+import Link from "next/link";
+import { use } from "react";
 
 export default function DeliverablePage({
   params,
@@ -26,12 +26,16 @@ export default function DeliverablePage({
   if (!project) return null;
 
   if (!config || !state) {
-    return <p className="text-sm text-ink-muted">This deliverable doesn&apos;t exist.</p>;
+    return (
+      <p className="text-sm text-ink-muted">
+        This deliverable doesn&apos;t exist.
+      </p>
+    );
   }
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 sm:gap-4">
         <div className="min-w-0">
           <Link
             href={`/projects/${id}/${phaseId}`}
@@ -39,10 +43,12 @@ export default function DeliverablePage({
           >
             <ArrowLeft size={12} /> Back to phase
           </Link>
-          <h1 className="font-serif text-xl font-semibold text-ink">{config.title}</h1>
+          <h1 className="font-serif text-xl font-semibold text-ink">
+            {config.title}
+          </h1>
           <p className="text-sm text-ink-muted mt-1">{config.description}</p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-2 shrink-0 self-start sm:self-auto">
           <Menu
             trigger={<Download size={15} />}
             items={config.exportFormats.map((format) => ({
@@ -57,7 +63,7 @@ export default function DeliverablePage({
               setDeliverableStatus(
                 project.id,
                 deliverableId,
-                state.status === "complete" ? "in-progress" : "complete"
+                state.status === "complete" ? "in-progress" : "complete",
               )
             }
           >
@@ -70,7 +76,9 @@ export default function DeliverablePage({
       <TemplateBody
         config={config}
         data={state.data}
-        onChange={(data) => updateDeliverableData(project.id, deliverableId, data)}
+        onChange={(data) =>
+          updateDeliverableData(project.id, deliverableId, data)
+        }
       />
     </div>
   );

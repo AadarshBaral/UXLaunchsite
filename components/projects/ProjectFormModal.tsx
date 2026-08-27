@@ -1,12 +1,12 @@
 "use client";
 
-import { useState } from "react";
-import { X } from "lucide-react";
-import Modal from "@/components/ui/Modal";
+import AvatarPicker from "@/components/projects/AvatarPicker";
 import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import AvatarPicker from "@/components/projects/AvatarPicker";
+import Modal from "@/components/ui/Modal";
 import type { Project } from "@/lib/workflow/types";
+import { X } from "lucide-react";
+import { useState } from "react";
 
 export interface ProjectFormValues {
   name: string;
@@ -30,17 +30,28 @@ export default function ProjectFormModal({
   const isEdit = !!project;
   const [name, setName] = useState(project?.name ?? "");
   const [avatar, setAvatar] = useState(project?.avatar);
-  const [startDate, setStartDate] = useState(project?.startDate ?? new Date().toISOString().slice(0, 10));
+  const [startDate, setStartDate] = useState(
+    project?.startDate ?? new Date().toISOString().slice(0, 10),
+  );
   const [dueDate, setDueDate] = useState(project?.dueDate ?? "");
 
   function submit() {
     if (!name.trim()) return;
-    onSubmit({ name, avatar, startDate: startDate || undefined, dueDate: dueDate || undefined });
+    onSubmit({
+      name,
+      avatar,
+      startDate: startDate || undefined,
+      dueDate: dueDate || undefined,
+    });
     onClose();
   }
 
   return (
-    <Modal open={open} onClose={onClose} title={isEdit ? "Project settings" : "New project"}>
+    <Modal
+      open={open}
+      onClose={onClose}
+      title={isEdit ? "Project settings" : "New project"}
+    >
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -51,7 +62,9 @@ export default function ProjectFormModal({
         <AvatarPicker value={avatar} name={name || "?"} onChange={setAvatar} />
 
         <div>
-          <label className="block text-xs font-medium text-ink-muted mb-1.5">Project name</label>
+          <label className="block text-xs font-medium text-ink-muted mb-1.5">
+            Project name
+          </label>
           <Input
             autoFocus
             value={name}
@@ -60,15 +73,27 @@ export default function ProjectFormModal({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <div>
-            <label className="block text-xs font-medium text-ink-muted mb-1.5">Start date</label>
-            <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+            <label className="block text-xs font-medium text-ink-muted mb-1.5">
+              Start date
+            </label>
+            <Input
+              type="date"
+              value={startDate}
+              onChange={(e) => setStartDate(e.target.value)}
+            />
           </div>
           <div>
-            <label className="block text-xs font-medium text-ink-muted mb-1.5">Due date (optional)</label>
+            <label className="block text-xs font-medium text-ink-muted mb-1.5">
+              Due date (optional)
+            </label>
             <div className="flex items-center gap-1.5">
-              <Input type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
+              <Input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
+              />
               {dueDate && (
                 <button
                   type="button"

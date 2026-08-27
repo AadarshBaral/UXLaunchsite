@@ -1,5 +1,5 @@
 import AuthSync from "@/components/auth/AuthSync";
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Merriweather, Raleway } from "next/font/google";
 import "./globals.css";
 
@@ -17,6 +17,12 @@ const merriweather = Merriweather({
 export const metadata: Metadata = {
   title: "UX Launchsite",
   description: "Zero-to-one UX design system & workflow management tool.",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

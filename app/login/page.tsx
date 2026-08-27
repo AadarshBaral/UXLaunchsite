@@ -70,25 +70,25 @@ export default function LoginPage() {
 
   return (
     <div
-      className="flex-1 relative flex items-center justify-center px-6 py-16"
+      className="flex-1 relative flex items-center justify-center px-4 sm:px-6 py-12 sm:py-16 min-h-screen"
       style={{
         backgroundImage: "url('/bg.jpg')",
         backgroundSize: "cover",
         backgroundPosition: "center",
       }}
     >
-      <div className="absolute top-6 left-6">
+      <div className="absolute top-4 left-4 sm:top-6 sm:left-6">
         <Image
           src="/full-logo.png"
           alt="UX Launch Site"
           width={160}
           height={39}
-          className="h-8 w-auto"
+          className="h-7 sm:h-8 w-auto logo-adaptive"
         />
       </div>
 
       <div
-        className="w-full max-w-sm bg-background border border-line rounded-3xl shadow-md shadow-purple-400/20 p-8 flex flex-col gap-5"
+        className="w-full max-w-sm bg-background border border-line rounded-2xl sm:rounded-3xl shadow-md shadow-purple-400/20 p-6 sm:p-8 flex flex-col gap-5 my-8"
         style={{
           background:
             "linear-gradient(to bottom, #cfe7f7 0%, #e3f1fa 15%, #f5fafd 30%, #ffffff 45%)",
