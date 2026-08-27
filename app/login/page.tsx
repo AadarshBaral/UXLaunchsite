@@ -4,9 +4,10 @@ import GoogleIcon from "@/components/auth/GoogleIcon";
 import Button from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { createClient } from "@/lib/supabase/client";
+import { Eye, EyeOff } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 type Mode = "sign-in" | "sign-up";
 
@@ -15,9 +16,15 @@ export default function LoginPage() {
   const [mode, setMode] = useState<Mode>("sign-in");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirmSent, setConfirmSent] = useState(false);
+
+  // Force light mode on login/register page
+  useEffect(() => {
+    document.documentElement.classList.remove("dark");
+  }, []);
 
   async function handleGoogle() {
     setError(null);
@@ -83,7 +90,7 @@ export default function LoginPage() {
           alt="UX Launch Site"
           width={160}
           height={39}
-          className="h-7 sm:h-8 w-auto logo-adaptive"
+          className="h-7 sm:h-8 w-auto"
         />
       </div>
 
@@ -156,14 +163,25 @@ export default function LoginPage() {
                 <label className="block text-xs font-medium text-ink-muted mb-1.5">
                   Password
                 </label>
-                <Input
-                  type="password"
-                  required
-                  minLength={6}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                />
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    required
+                    minLength={6}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    className="pr-9"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                    className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-ink-muted hover:text-ink transition-colors cursor-pointer rounded-md"
+                  >
+                    {showPassword ? <EyeOff size={15} /> : <Eye size={15} />}
+                  </button>
+                </div>
               </div>
 
               {error && <p className="text-sm text-status-red">{error}</p>}
