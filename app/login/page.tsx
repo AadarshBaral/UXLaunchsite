@@ -48,7 +48,7 @@ export default function LoginPage() {
       router.push("/");
       router.refresh();
     } else {
-      const { error } = await supabase.auth.signUp({
+      const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
@@ -58,7 +58,13 @@ export default function LoginPage() {
         setError(error.message);
         return;
       }
-      setConfirmSent(true);
+      // If email confirmation is disabled, Supabase returns a session immediately
+      if (data.session) {
+        router.push("/");
+        router.refresh();
+      } else {
+        setConfirmSent(true);
+      }
     }
   }
 

@@ -1,5 +1,6 @@
 import SignOutButton from "@/components/auth/SignOutButton";
 import { createClient } from "@/lib/supabase/server";
+import Image from "next/image";
 import Link from "next/link";
 
 export default async function TopNav() {
@@ -11,11 +12,14 @@ export default async function TopNav() {
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-background">
       <div className="mx-auto max-w-[1280px] px-6 h-14 flex items-center gap-8">
-        <Link
-          href="/"
-          className="font-serif text-base font-semibold text-ink tracking-tight"
-        >
-          UX Launchsite
+        <Link href="/" className="flex items-center shrink-0">
+          <Image
+            src="/full-logo.png"
+            alt="UX Launchsite"
+            width={160}
+            height={39}
+            className="h-7 w-auto"
+          />
         </Link>
         <nav className="flex items-center gap-6 text-sm flex-1">
           <Link
