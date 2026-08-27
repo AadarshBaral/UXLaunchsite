@@ -8,35 +8,39 @@ import { Input } from "@/components/ui/Input";
 import AvatarPicker from "@/components/projects/AvatarPicker";
 import type { Project } from "@/lib/workflow/types";
 
-export default function ProjectSettingsModal({
+export interface ProjectFormValues {
+  name: string;
+  avatar?: string;
+  startDate?: string;
+  dueDate?: string;
+}
+
+export default function ProjectFormModal({
   open,
   project,
   onClose,
-  onSave,
+  onSubmit,
 }: {
   open: boolean;
-  project: Project;
+  /** Pass an existing project to edit it; omit to create a new one. */
+  project?: Project;
   onClose: () => void;
-  onSave: (patch: {
-    name: string;
-    avatar?: string;
-    startDate?: string;
-    dueDate?: string;
-  }) => void;
+  onSubmit: (values: ProjectFormValues) => void;
 }) {
-  const [name, setName] = useState(project.name);
-  const [avatar, setAvatar] = useState(project.avatar);
-  const [startDate, setStartDate] = useState(project.startDate ?? "");
-  const [dueDate, setDueDate] = useState(project.dueDate ?? "");
+  const isEdit = !!project;
+  const [name, setName] = useState(project?.name ?? "");
+  const [avatar, setAvatar] = useState(project?.avatar);
+  const [startDate, setStartDate] = useState(project?.startDate ?? new Date().toISOString().slice(0, 10));
+  const [dueDate, setDueDate] = useState(project?.dueDate ?? "");
 
   function submit() {
     if (!name.trim()) return;
-    onSave({ name, avatar, startDate: startDate || undefined, dueDate: dueDate || undefined });
+    onSubmit({ name, avatar, startDate: startDate || undefined, dueDate: dueDate || undefined });
     onClose();
   }
 
   return (
-    <Modal open={open} onClose={onClose} title="Project settings">
+    <Modal open={open} onClose={onClose} title={isEdit ? "Project settings" : "New project"}>
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -44,11 +48,16 @@ export default function ProjectSettingsModal({
         }}
         className="flex flex-col gap-4"
       >
-        <AvatarPicker value={avatar} name={name} onChange={setAvatar} />
+        <AvatarPicker value={avatar} name={name || "?"} onChange={setAvatar} />
 
         <div>
           <label className="block text-xs font-medium text-ink-muted mb-1.5">Project name</label>
-          <Input autoFocus value={name} onChange={(e) => setName(e.target.value)} />
+          <Input
+            autoFocus
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Onboarding Redesign"
+          />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -79,7 +88,7 @@ export default function ProjectSettingsModal({
             Cancel
           </Button>
           <Button type="submit" variant="primary" disabled={!name.trim()}>
-            Save
+            {isEdit ? "Save" : "Create project"}
           </Button>
         </div>
       </form>

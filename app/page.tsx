@@ -9,8 +9,7 @@ import { formatDate, isOverdue } from "@/lib/date";
 import Button from "@/components/ui/Button";
 import Menu, { type MenuItem } from "@/components/ui/Menu";
 import Avatar from "@/components/ui/Avatar";
-import NewProjectModal from "@/components/projects/NewProjectModal";
-import ProjectSettingsModal from "@/components/projects/ProjectSettingsModal";
+import ProjectFormModal from "@/components/projects/ProjectFormModal";
 import ConfirmModal from "@/components/ui/ConfirmModal";
 import PhaseDots from "@/components/projects/PhaseDots";
 import ProjectCard from "@/components/projects/ProjectCard";
@@ -41,8 +40,12 @@ export default function ProjectsHome() {
     [projects, query]
   );
 
-  function handleCreate(name: string) {
-    const id = createProject(name);
+  function handleCreate(values: { name: string; avatar?: string; startDate?: string; dueDate?: string }) {
+    const id = createProject(values.name, {
+      avatar: values.avatar,
+      startDate: values.startDate,
+      dueDate: values.dueDate,
+    });
     setNewOpen(false);
     router.push(`/projects/${id}`);
   }
@@ -203,14 +206,14 @@ export default function ProjectsHome() {
         </div>
       )}
 
-      <NewProjectModal open={newOpen} onClose={() => setNewOpen(false)} onCreate={handleCreate} />
+      <ProjectFormModal open={newOpen} onClose={() => setNewOpen(false)} onSubmit={handleCreate} />
       {settingsTarget && (
-        <ProjectSettingsModal
+        <ProjectFormModal
           key={settingsTarget.id}
           open={!!settingsTarget}
           project={settingsTarget}
           onClose={() => setSettingsTarget(null)}
-          onSave={(patch) => updateProjectDetails(settingsTarget.id, patch)}
+          onSubmit={(patch) => updateProjectDetails(settingsTarget.id, patch)}
         />
       )}
       <ConfirmModal

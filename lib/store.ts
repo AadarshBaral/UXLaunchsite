@@ -18,7 +18,10 @@ interface StoreState {
   projects: Project[];
   hasHydrated: boolean;
   setHasHydrated: (v: boolean) => void;
-  createProject: (name: string) => string;
+  createProject: (
+    name: string,
+    details?: Partial<Pick<Project, "avatar" | "startDate" | "dueDate">>
+  ) => string;
   updateProjectDetails: (
     id: string,
     patch: Partial<Pick<Project, "name" | "avatar" | "startDate" | "dueDate">>
@@ -37,7 +40,7 @@ export const useStore = create<StoreState>()(
       hasHydrated: false,
       setHasHydrated: (v) => set({ hasHydrated: v }),
 
-      createProject: (name) => {
+      createProject: (name, details) => {
         const id = makeId();
         const now = new Date().toISOString();
         const project: Project = {
@@ -47,6 +50,7 @@ export const useStore = create<StoreState>()(
           createdAt: now,
           updatedAt: now,
           deliverables: freshDeliverables(),
+          ...details,
         };
         set((s) => ({ projects: [project, ...s.projects] }));
         return id;

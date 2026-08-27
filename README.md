@@ -1,8 +1,6 @@
 # UX Launchpad
 
-A local-first workflow tool that walks a UI/UX designer or research team through five sequential phases — from business framing to a Pre-Figma readiness gate — with an interactive, editable template for every deliverable along the way.
-
-No backend, no account. Every project lives in your browser's local storage; export to JSON any time you want a portable backup.
+A workflow tool that walks a UI/UX designer or research team through five sequential phases — from business framing to a Pre-Figma readiness gate — with an interactive, editable template for every deliverable along the way.
 
 ## What it does
 
@@ -72,8 +70,3 @@ lib/
   store.ts                              Zustand store (local-storage persisted)
   supabase/                             Scaffolded Supabase client/server/middleware helpers
 ```
-
-## Data & privacy
-
-Everything you enter is stored only in your browser's local storage under the `ux-launchpad-storage` key. There is no server component to this app's actual features — clearing site data (or switching browsers/devices) will lose your projects unless you've exported them as JSON first.
-"# UXLaunchsite" 

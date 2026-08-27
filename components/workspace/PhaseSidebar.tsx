@@ -9,7 +9,7 @@ import { getOverallProgress, getPhaseProgress, getPhaseStatus, isGateUnlocked } 
 import { useStore } from "@/lib/store";
 import { formatDate, isOverdue } from "@/lib/date";
 import Avatar from "@/components/ui/Avatar";
-import ProjectSettingsModal from "@/components/projects/ProjectSettingsModal";
+import ProjectFormModal from "@/components/projects/ProjectFormModal";
 import type { DeliverableStatus, Project } from "@/lib/workflow/types";
 
 const DOT_COLOR: Record<DeliverableStatus, string> = {
@@ -108,12 +108,12 @@ export default function PhaseSidebar({ project }: { project: Project }) {
         </Link>
       </nav>
 
-      <ProjectSettingsModal
+      <ProjectFormModal
         key={project.id}
         open={settingsOpen}
         project={project}
         onClose={() => setSettingsOpen(false)}
-        onSave={(patch) => updateProjectDetails(project.id, patch)}
+        onSubmit={(patch) => updateProjectDetails(project.id, patch)}
       />
     </aside>
   );
