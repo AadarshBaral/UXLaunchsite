@@ -1,69 +1,226 @@
-import Image from "next/image";
+"use client";
 
-export default function Home() {
+import { useMemo, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { LayoutGrid, List, Plus, Search, Upload } from "lucide-react";
+import { useStore } from "@/lib/store";
+import { getOverallProgress } from "@/lib/workflow/progress";
+import { formatDate, isOverdue } from "@/lib/date";
+import Button from "@/components/ui/Button";
+import Menu, { type MenuItem } from "@/components/ui/Menu";
+import Avatar from "@/components/ui/Avatar";
+import NewProjectModal from "@/components/projects/NewProjectModal";
+import ProjectSettingsModal from "@/components/projects/ProjectSettingsModal";
+import ConfirmModal from "@/components/ui/ConfirmModal";
+import PhaseDots from "@/components/projects/PhaseDots";
+import ProjectCard from "@/components/projects/ProjectCard";
+import { downloadFile, slugify } from "@/lib/export";
+import type { Project } from "@/lib/workflow/types";
+
+type ViewMode = "list" | "card";
+
+export default function ProjectsHome() {
+  const router = useRouter();
+  const hasHydrated = useStore((s) => s.hasHydrated);
+  const projects = useStore((s) => s.projects);
+  const createProject = useStore((s) => s.createProject);
+  const updateProjectDetails = useStore((s) => s.updateProjectDetails);
+  const deleteProject = useStore((s) => s.deleteProject);
+  const duplicateProject = useStore((s) => s.duplicateProject);
+  const importProject = useStore((s) => s.importProject);
+
+  const [query, setQuery] = useState("");
+  const [view, setView] = useState<ViewMode>("list");
+  const [newOpen, setNewOpen] = useState(false);
+  const [settingsTarget, setSettingsTarget] = useState<Project | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<Project | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const filtered = useMemo(
+    () => projects.filter((p) => p.name.toLowerCase().includes(query.toLowerCase())),
+    [projects, query]
+  );
+
+  function handleCreate(name: string) {
+    const id = createProject(name);
+    setNewOpen(false);
+    router.push(`/projects/${id}`);
+  }
+
+  function handleImportFile(file: File) {
+    const reader = new FileReader();
+    reader.onload = () => {
+      try {
+        const parsed = JSON.parse(String(reader.result)) as Project;
+        if (!parsed.deliverables || !parsed.name) throw new Error("Invalid file");
+        const id = importProject(parsed);
+        router.push(`/projects/${id}`);
+      } catch {
+        alert("That file doesn't look like a valid UX Launchpad project export.");
+      }
+    };
+    reader.readAsText(file);
+  }
+
+  function menuItemsFor(project: Project): MenuItem[] {
+    return [
+      { label: "Settings", onSelect: () => setSettingsTarget(project) },
+      { label: "Duplicate", onSelect: () => duplicateProject(project.id) },
+      {
+        label: "Export JSON",
+        onSelect: () =>
+          downloadFile(`${slugify(project.name)}.json`, JSON.stringify(project, null, 2), "application/json"),
+      },
+      { label: "Delete", onSelect: () => setDeleteTarget(project), danger: true },
+    ];
+  }
+
+  if (!hasHydrated) {
+    return <div className="mx-auto max-w-[1280px] w-full px-6 py-8" />;
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="mx-auto max-w-[1280px] w-full px-6 py-8 flex flex-col gap-6">
+      <div className="flex items-center justify-between">
+        <h1 className="font-serif text-2xl font-semibold text-ink">Projects</h1>
+        <div className="flex items-center gap-2">
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="application/json"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleImportFile(file);
+              e.target.value = "";
+            }}
+          />
+          <Button variant="secondary" size="md" onClick={() => fileInputRef.current?.click()}>
+            <Upload size={14} /> Import
+          </Button>
+          <Button variant="primary" size="md" onClick={() => setNewOpen(true)}>
+            <Plus size={14} /> New project
+          </Button>
+        </div>
+      </div>
+
+      <div className="flex items-center justify-between gap-3">
+        <div className="relative max-w-xs flex-1">
+          <Search size={14} className="absolute left-2.5 top-1/2 -translate-y-1/2 text-ink-disabled" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search projects"
+            className="h-9 w-full rounded-md border border-line bg-background pl-8 pr-3 text-sm text-ink placeholder:text-ink-disabled focus:outline-none focus:ring-1 focus:ring-accent"
+          />
+        </div>
+        <div className="flex items-center border border-line rounded-md p-0.5 shrink-0">
+          <button
+            onClick={() => setView("list")}
+            aria-label="List view"
+            className={`h-7 w-7 inline-flex items-center justify-center rounded cursor-pointer ${
+              view === "list" ? "bg-surface text-ink" : "text-ink-disabled hover:text-ink"
+            }`}
+          >
+            <List size={15} />
+          </button>
+          <button
+            onClick={() => setView("card")}
+            aria-label="Card view"
+            className={`h-7 w-7 inline-flex items-center justify-center rounded cursor-pointer ${
+              view === "card" ? "bg-surface text-ink" : "text-ink-disabled hover:text-ink"
+            }`}
+          >
+            <LayoutGrid size={15} />
+          </button>
+        </div>
+      </div>
+
+      {filtered.length === 0 ? (
+        <div className="border border-line rounded-md py-16 flex flex-col items-center justify-center gap-3 text-center">
+          <p className="text-sm text-ink-muted">
+            {projects.length === 0 ? "No projects yet." : "No projects match your search."}
           </p>
+          {projects.length === 0 && (
+            <Button variant="secondary" size="sm" onClick={() => setNewOpen(true)}>
+              Create your first project
+            </Button>
+          )}
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      ) : view === "list" ? (
+        <div className="border border-line rounded-md overflow-hidden">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b border-line bg-surface text-xs font-medium text-ink-muted">
+                <th className="text-left px-4 py-2 font-medium">Name</th>
+                <th className="text-left px-4 py-2 font-medium w-32">Phases</th>
+                <th className="text-right px-4 py-2 font-medium w-20">Progress</th>
+                <th className="text-left px-4 py-2 font-medium w-28">Due</th>
+                <th className="text-left px-4 py-2 font-medium w-28">Updated</th>
+                <th className="w-10" />
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((project) => {
+                const progress = getOverallProgress(project);
+                const overdue = isOverdue(project.dueDate, progress.ratio === 1);
+                return (
+                  <tr
+                    key={project.id}
+                    onClick={() => router.push(`/projects/${project.id}`)}
+                    className="border-b border-line last:border-b-0 h-12 hover:bg-surface cursor-pointer transition-colors"
+                  >
+                    <td className="px-4 py-2">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <Avatar src={project.avatar} name={project.name} size={24} />
+                        <span className="font-medium text-ink truncate">{project.name}</span>
+                      </div>
+                    </td>
+                    <td className="px-4 py-2">
+                      <PhaseDots project={project} />
+                    </td>
+                    <td className="px-4 py-2 text-right text-ink-muted tabular-nums">
+                      {progress.complete}/{progress.total}
+                    </td>
+                    <td className={`px-4 py-2 ${overdue ? "text-status-red" : "text-ink-muted"}`}>
+                      {formatDate(project.dueDate)}
+                    </td>
+                    <td className="px-4 py-2 text-ink-muted">{formatDate(project.updatedAt)}</td>
+                    <td className="px-2 py-2 text-right" onClick={(e) => e.stopPropagation()}>
+                      <Menu items={menuItemsFor(project)} />
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-      </main>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {filtered.map((project) => (
+            <ProjectCard key={project.id} project={project} menuItems={menuItemsFor(project)} />
+          ))}
+        </div>
+      )}
+
+      <NewProjectModal open={newOpen} onClose={() => setNewOpen(false)} onCreate={handleCreate} />
+      {settingsTarget && (
+        <ProjectSettingsModal
+          key={settingsTarget.id}
+          open={!!settingsTarget}
+          project={settingsTarget}
+          onClose={() => setSettingsTarget(null)}
+          onSave={(patch) => updateProjectDetails(settingsTarget.id, patch)}
+        />
+      )}
+      <ConfirmModal
+        open={!!deleteTarget}
+        title="Delete project"
+        description={`This permanently deletes "${deleteTarget?.name}" and everything in it. This can't be undone.`}
+        confirmLabel="Delete"
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => deleteTarget && deleteProject(deleteTarget.id)}
+      />
     </div>
   );
 }
